@@ -31,7 +31,7 @@ class LuxMedSniper:
     def _createSession(self):
         self.session = requests.session()
         self.session.headers.update({
-            'Custom-User-Agent': 'PatientPortal; 3.20.5; 4380E6AC-D291-4895-8B1B-F774C318BD7D; iOS; 13.5.1; iPhone8,1'})
+            'Custom-User-Agent': 'PatientPortal; 4.20.5; 4380E6AC-D291-4895-8B1B-F774C318BD7D; iOS; 14.5.1; iPhone8,1'})
         self.session.headers.update({
             'User-Agent': 'PatientPortal/3.20.5 (pl.luxmed.pp.LUX-MED; build:853; iOS 13.5.1) Alamofire/4.9.1'})
         self.session.headers.update({'Accept-Language': 'en;q=1.0, en-PL;q=0.9, pl-PL;q=0.8, ru-PL;q=0.7, uk-PL;q=0.6'})
@@ -57,6 +57,7 @@ class LuxMedSniper:
                       'password': self.config['luxmed']['password']}
         resp = self.session.post(self.LUXMED_LOGIN_URL, login_data)
         content = json.loads(resp.text)
+        self.log.info(content)
         self.access_token = content['access_token']
         self.refresh_token = content['refresh_token']
         self.token_type = content['token_type']
