@@ -26,6 +26,11 @@ misc:
   notifydb: ./surgeon_data # State file used to remember which notifications has been sent already
 ```
 
+you can also modify luxmedSniper.yaml.template file and rename it to luxmedSniper.yaml and run it:
+```
+python3 luxmedSnip.py
+```
+
 2) Run it
 ```
 nohup python3 luxmedSnip.py -c /path/to/my_favourite_surgeon.yml &
