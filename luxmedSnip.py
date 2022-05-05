@@ -5,7 +5,6 @@ import json
 import logging
 import os
 import datetime
-import pushover
 import shelve
 import schedule
 import requests
@@ -24,8 +23,6 @@ class LuxMedSniper:
         self._loadConfiguration(configuration_file)
         self._createSession()
         self._logIn()
-        pushover.init(self.config['pushover']['api_token'])
-        self.pushoverClient = pushover.Client(self.config['pushover']['user_key'])
 
     def _createSession(self):
         self.session = requests.session()
@@ -109,9 +106,6 @@ class LuxMedSniper:
             if not self._isAlreadyKnown(appointment):
                 self._addToDatabase(appointment)
                 self._sendNotification(appointment)
-                self.log.info(
-                    "Notification sent! {AppointmentDate} at {ClinicPublicName} - {DoctorName}".format(
-                        **appointment))
             else:
                 self.log.info('Notification was already sent.')
 

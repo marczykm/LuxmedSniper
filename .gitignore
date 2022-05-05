@@ -103,6 +103,6 @@ venv.bak/
 # mypy
 .mypy_cache/
 
-surgeon_data.db
+surgeon_data.*
 *.yaml
 nohup.out
