@@ -103,5 +103,6 @@ venv.bak/
 # mypy
 .mypy_cache/
 
-surgeon_data
-luxmedSniper.yaml
+surgeon_data.db
+*.yaml
+nohup.out

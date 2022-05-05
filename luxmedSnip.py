@@ -14,7 +14,6 @@ import time
 coloredlogs.install(level="INFO")
 log = logging.getLogger("main")
 
-
 class LuxMedSniper:
     LUXMED_LOGIN_URL = 'https://portalpacjenta.luxmed.pl/PatientPortalMobileAPI/api/token'
     NEW_PORTAL_RESERVATION_URL = 'https://portalpacjenta.luxmed.pl/PatientPortalMobileAPI/api/visits/available-terms'
@@ -124,8 +123,8 @@ class LuxMedSniper:
         db.close()
 
     def _sendNotification(self, appointment):
-        self.pushoverClient.send_message(self.config['pushover']['message_template'].format(
-            **appointment, title=self.config['pushover']['title']))
+        text = "{AppointmentDate} at {ClinicPublicName} - {DoctorName}".format(**appointment)
+        requests.post('http://192.168.1.21:1880/endpoint/luxmed', data={'message':text})
 
     def _isAlreadyKnown(self, appointment):
         db = shelve.open(self.config['misc']['notifydb'])
