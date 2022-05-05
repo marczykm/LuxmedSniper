@@ -9,9 +9,14 @@ import shelve
 import schedule
 import requests
 import time
+from flask import Flask
+from flask import render_template
+from flask import redirect, url_for
+import multiprocessing
 
 coloredlogs.install(level="INFO")
 log = logging.getLogger("main")
+app = Flask(__name__)
 
 class LuxMedSniper:
     LUXMED_LOGIN_URL = 'https://portalpacjenta.luxmed.pl/PatientPortalMobileAPI/api/token'
@@ -136,21 +141,55 @@ def work(config):
     except Exception as s:
         log.error(s)
 
+@app.route("/")
+def index():
+    print(p)
+    return render_template('index.html')
 
-if __name__ == "__main__":
-    log.info("LuxMedSniper - Lux Med Appointment Sniper")
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "-c", "--config",
-        help="Configuration file path (default: luxmedSniper.yaml)", default="luxmedSniper.yaml"
-    )
-    parser.add_argument(
-        "-d", "--delay",
-        type=int, help="Delay in s of fetching updates (default: 1800)", default="1800"
-    )
-    args = parser.parse_args()
-    work(args.config)
-    schedule.every(args.delay).seconds.do(work, args.config)
+def scheduler_thread(name, delay):
+    work(name)
+    schedule.every(delay).seconds.do(work, name)
     while True:
         schedule.run_pending()
         time.sleep(1)
+
+p = {}
+
+@app.route("/start/<name>")
+def hello(name=None):
+    try:
+        p[name] = multiprocessing.Process(target=scheduler_thread, args=(name, 10,))
+        p[name].start()
+    except:
+        log.error("Error: unable to start thread")
+    return redirect("/")
+
+@app.route("/stop/<name>")
+def stop(name=None):
+    try:
+        p[name].terminate()
+        del p[name]
+    except:
+        log.error("Error exiting thread")
+    return redirect("/")
+
+if __name__ == "__main__":
+    app.run(host='0.0.0.0', port=5002)
+
+# if __name__ == "__main__":
+#     log.info("LuxMedSniper - Lux Med Appointment Sniper")
+#     parser = argparse.ArgumentParser()
+#     parser.add_argument(
+#         "-c", "--config",
+#         help="Configuration file path (default: luxmedSniper.yaml)", default="luxmedSniper.yaml"
+#     )
+#     parser.add_argument(
+#         "-d", "--delay",
+#         type=int, help="Delay in s of fetching updates (default: 1800)", default="1800"
+#     )
+#     args = parser.parse_args()
+#     work(args.config)
+#     schedule.every(args.delay).seconds.do(work, args.config)
+#     while True:
+#         schedule.run_pending()
+#         time.sleep(1)
