@@ -3,9 +3,22 @@
     <title>Luxmed Sniper</title>
 </header>
 <body>
+    <h1>Luxmed Sniper</h1>
+    <h3>Uruchom wyszukiwanie dla:</h3>
     <ul>
         <li>Marysia <a href="/start/marysia.yaml">start</a> <a href="/stop/marysia.yaml">stop</a></li>
         <li>Ania <a href="/start/ania.yaml">start</a> <a href="/stop/ania.yaml">stop</a></li>
         <li>Marcin <a href="/start/marcin.yaml">start</a> <a href="/stop/marcin.yaml">stop</a></li>
     </ul>
+    {% if processes %}
+    <hr/>
+    <div>
+        <h3>Uruchomione wyszukiwania:</h3>
+        <ul>
+            {% for p in processes %}
+                <li>{{ p }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
 </body>

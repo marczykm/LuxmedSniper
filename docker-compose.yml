@@ -2,4 +2,7 @@ version: "3.3"
    
 services:
   luxmedsniper:
+    restart: always
     build: .
+    ports:
+      - 5002:5002

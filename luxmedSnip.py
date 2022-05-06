@@ -144,7 +144,7 @@ def work(config):
 @app.route("/")
 def index():
     print(p)
-    return render_template('index.html')
+    return render_template('index.html', processes=p)
 
 def scheduler_thread(name, delay):
     work(name)
