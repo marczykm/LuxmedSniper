@@ -17,6 +17,7 @@ import multiprocessing
 coloredlogs.install(level="INFO")
 log = logging.getLogger("main")
 app = Flask(__name__)
+clinicNames = ['LX Wrocław - Wołowska 20', 'LX Wrocław - Fabryczna 6', 'LX Wrocław – Legnicka 51-53']
 
 class LuxMedSniper:
     LUXMED_LOGIN_URL = 'https://portalpacjenta.luxmed.pl/PatientPortalMobileAPI/api/token'
@@ -106,13 +107,14 @@ class LuxMedSniper:
             return
         for appointment in appointments:
             self.log.info(
-                "Appointment found! {AppointmentDate} at {ClinicPublicName} - {DoctorName}".format(
+                "Appointment found! "+self.config['luxmed']['email']+": {AppointmentDate} at {ClinicPublicName} - {DoctorName}".format(
                     **appointment))
-            if not self._isAlreadyKnown(appointment):
-                self._addToDatabase(appointment)
-                self._sendNotification(appointment)
-            else:
-                self.log.info('Notification was already sent.')
+            if appointment['ClinicPublicName'] in clinicNames:
+                if not self._isAlreadyKnown(appointment):
+                    self._addToDatabase(appointment)
+                    self._sendNotification(appointment)
+                else:
+                    self.log.info('Notification was already sent.')
 
     def _addToDatabase(self, appointment):
         db = shelve.open(self.config['misc']['notifydb'])
@@ -122,7 +124,13 @@ class LuxMedSniper:
         db.close()
 
     def _sendNotification(self, appointment):
-        text = "{AppointmentDate} at {ClinicPublicName} - {DoctorName}".format(**appointment)
+        if self.config['luxmed']['email'] == 'm.n.marczyk@gmail.com':
+            name = 'Marysia'
+        elif self.config['luxmed']['email'] == 'm.l.marczyk@gmail.com':
+            name = 'Marcin'
+        elif self.config['luxmed']['email'] == 'aanku.wr@gmail.com':
+            name = 'Ania'
+        text = name + ": {AppointmentDate} at {ClinicPublicName} - {DoctorName}".format(**appointment)
         requests.post('http://192.168.1.21:1880/endpoint/luxmed', data={'message':text})
 
     def _isAlreadyKnown(self, appointment):
@@ -158,7 +166,7 @@ p = {}
 @app.route("/start/<name>")
 def hello(name=None):
     try:
-        p[name] = multiprocessing.Process(target=scheduler_thread, args=(name, 10,))
+        p[name] = multiprocessing.Process(target=scheduler_thread, args=(name, 30,))
         p[name].start()
     except:
         log.error("Error: unable to start thread")
